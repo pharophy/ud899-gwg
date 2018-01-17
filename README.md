@@ -62,12 +62,24 @@ ports:
 ## Notes
 
 ### Creating a Service Worker:
+```javascript
   if (!navigator.serviceWorker) return;
   navigator.serviceWorker.register('sw.js', { scope : './' })
     .then( (registration) => { console.log('Service worker registered with: ', registration); });
+```
 
-
-### Initializing a Service Worker:
+#### Initializing a Service Worker:
+```javascript
 self.addEventListener('fetch', function(event) {
   console.log('HTTP Request captured: ', event.request);
 });
+```
+
+#### Responding with Service Worker:
+```javascript
+self.addEventListener('fetch', function(event) {
+  event.respondWith(
+    new Response( responseString, { headers :{ 'Content-Type' : 'text/html' } })
+  );
+});
+```
