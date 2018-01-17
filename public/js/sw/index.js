@@ -1,3 +1,3 @@
 self.addEventListener('fetch', function(event) {
-  console.log('HTTP Request captured: ', event.request);
+  console.log('HTTP Request captured: CHANGED CONTENT', event.request);
 });
