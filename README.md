@@ -83,3 +83,6 @@ self.addEventListener('fetch', function(event) {
   );
 });
 ```
+- Also, instead of responding with a true Response stream, use the fetch() api which will return a promise that respondWith accepts
+- Side note, use fetch() now instead of XMLHttpRequests
+
