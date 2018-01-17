@@ -1,9 +1,11 @@
 self.addEventListener('fetch', function(event) {
-  event.respondWith(
-    new Response("My string <b class=\"a-winner-is-me\">hello world</b>", {
-      headers :{
-        'Content-Type' : 'text/html'
-      }
-    })
-  );
+  
+  console.log(event.request);
+  if (event.request.url.indexOf('.jpg') > -1) {
+    event.respondWith(
+      fetch('/imgs/dr-evil.gif')
+    );
+    console.log('responded with dr evil!');
+  }
+  
 });
