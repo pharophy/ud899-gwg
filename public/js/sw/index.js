@@ -1,3 +1,9 @@
 self.addEventListener('fetch', function(event) {
-  console.log('HTTP Request captured: CHANGED CONTENT', event.request);
+  event.respondWith(
+    new Response("My string <b class=\"a-winner-is-me\">hello world</b>", {
+      headers :{
+        'Content-Type' : 'text/html'
+      }
+    })
+  );
 });
