@@ -96,6 +96,15 @@ self.addEventListener('install', function(event) {
 ```
 Use this at install of a new version of the service worker.  We can use this to initially cache all the requests we want from the backend
 
+
+#### Activate Event
+```javascript
+self.addEventListener('activate', (event) => {
+
+});
+```
+This event fires when a new version of the service worker is activated
+
 ### Caching API
 ```javascript
 //create a cache-box of name to store series of request / responses
@@ -111,4 +120,12 @@ caches.open('name-of-cache').then((cache) => {
   cache.match(request); //returns response or NULL
   caches.match(request) // does the same, except searches all caches
 })
+```
+
+#### Cache Methods
+```javascript
+caches.open('cache-name') //creates a new cache with the specified name
+caches.match(request) //searches all caches for request
+caches.delete('cache-name'); //deletes a cache
+caches.keys() //gets all keys for all caches
 ```
