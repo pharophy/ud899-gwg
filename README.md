@@ -90,7 +90,7 @@ self.addEventListener('fetch', function(event) {
 ```javascript
 self.addEventListener('install', function(event) {
 
-  event.waitUntil(promise)
+  event.waitUntil(promise)  //hold this event and wait until promises are resolved
 
 })
 ```
