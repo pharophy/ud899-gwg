@@ -1,5 +1,7 @@
 import 'babel-polyfill';
 
+let staticCacheName = 'wittr-static-v3';
+
 self.addEventListener('install', (event) => {
 
   const cacheIndex =  [
@@ -12,7 +14,7 @@ self.addEventListener('install', (event) => {
 ];
 
   event.waitUntil(
-    caches.open('wittr-static-v2').then((cache) => {
+    caches.open(staticCacheName).then((cache) => {
       cache.addAll(cacheIndex);
     })
   );
@@ -20,14 +22,14 @@ self.addEventListener('install', (event) => {
 });
 
 const cachedResource = async (request) => {
-  const cache = await caches.open('wittr-static-v2')
+  const cache = await caches.open(staticCacheName)
   let response = await cache.match(request);
   if (response) {
     return response;
   } else {
     return await fetch(request);
   }
-}
+};
 
 self.addEventListener('fetch', (event) => {
   
@@ -36,8 +38,16 @@ self.addEventListener('fetch', (event) => {
 
 });
 
+const filterCacheNames = async (event) => {
+  let keys = await caches.keys();
+  console.log(keys);
+  keys = keys.filter(key => key.startsWith('wittr-') && key != staticCacheName);
+  keys.map(key => {
+    return caches.delete(key);
+  });
+  
+};
+
 self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.delete('wittr-static-v1')
-  );
+  event.waitUntil(filterCacheNames());
 });
