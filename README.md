@@ -86,3 +86,29 @@ self.addEventListener('fetch', function(event) {
 - Also, instead of responding with a true Response stream, use the fetch() api which will return a promise that respondWith accepts
 - Side note, use fetch() now instead of XMLHttpRequests
 
+#### Install Event
+```javascript
+self.addEventListener('install', function(event) {
+
+  event.waitUntil(promise)
+
+})
+```
+Use this at install of a new version of the service worker.  We can use this to initially cache all the requests we want from the backend
+
+### Caching API
+```javascript
+//create a cache-box of name to store series of request / responses
+caches.open('name-of-cache').then((cache) => {
+
+  //Insert into cache:
+  cache.put(request, response); //stores a request / response pair in the cache
+
+  cache.addAll([ 'api/foo', 'api/bar' ]); //stores an array of request / resposne pairs
+    //addAll uses fetch under the hood
+
+  //Get from cache:
+  cache.match(request); //returns response or NULL
+  caches.match(request) // does the same, except searches all caches
+})
+```
