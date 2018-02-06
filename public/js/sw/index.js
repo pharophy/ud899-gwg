@@ -12,7 +12,7 @@ self.addEventListener('install', (event) => {
 ];
 
   event.waitUntil(
-    caches.open('wittr-static-v1').then((cache) => {
+    caches.open('wittr-static-v2').then((cache) => {
       cache.addAll(cacheIndex);
     })
   );
@@ -20,7 +20,7 @@ self.addEventListener('install', (event) => {
 });
 
 const cachedResource = async (request) => {
-  const cache = await caches.open('wittr-static-v1')
+  const cache = await caches.open('wittr-static-v2')
   let response = await cache.match(request);
   if (response) {
     return response;
@@ -33,5 +33,11 @@ self.addEventListener('fetch', (event) => {
   
   console.log(event);
   event.respondWith(cachedResource(event.request));
-  
+
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.delete('wittr-static-v1')
+  );
 });
