@@ -105,6 +105,60 @@ self.addEventListener('activate', (event) => {
 ```
 This event fires when a new version of the service worker is activated
 
+#### Listening to ServiceWorker Changes
+```javascript
+navigator.serviceWorker.register('/sw.js').then( (reg) => {
+  reg.unregister();
+  reg.update();
+  reg.installing || reg.waiting || reg.active; //will point to a service worker object or be null
+
+  reg.addEventListener('updatefound', () => {
+    //reg.installing has changed
+    //when this fires .installing has become the new worker
+  });
+
+  let sw = reg.installing;
+  console.log(sw.state); //.. logs ->
+    //'installing' - install event has fired but hasn't completed
+    //'installed' - installation completed successfully but hasn't yet activated
+    //'activating' - the activate event has fired but not yet complete
+    //'activated' - the service worker is ready to receive fetch events
+    //'redundant' - service worker has been throw away
+        //happens both when sw has been superceded and also when install failed
+
+  sw.addEventListener('statechange', () => {
+    //sw.state has changed
+  });
+
+  navigator.serviceWorker.controller; //refers to the service worker that controls this page
+
+  if (!navigator.serviceWorker.controller) { 
+    //page didn't load using a service worker
+  }
+
+  if (reg.waiting) {
+    //there's an update ready and waiting 
+  }
+
+  if (reg.installing) {
+    //there's an update in progress, but it might fail
+    reg.installing.addEventListener('statechange', () => {
+      if (this.state == 'installed') {
+        //there's an update ready and waiting
+      }
+    });
+  }
+
+  reg.addEventListener('updatefound', () => {
+    reg.installing.addEventListener('statechange', () => {
+      if (this.state == 'installed') {
+        //there's an update ready and waiting
+      }
+    });
+  });
+});
+```
+
 ### Caching API
 ```javascript
 //create a cache-box of name to store series of request / responses
