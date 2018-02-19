@@ -1,5 +1,5 @@
 import 'babel-polyfill';
-
+//test refresh SW
 let staticCacheName = 'wittr-static-v3';
 
 self.addEventListener('install', (event) => {
