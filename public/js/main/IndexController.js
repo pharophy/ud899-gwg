@@ -17,6 +17,48 @@ IndexController.prototype._registerServiceWorker = function() {
   const swPromise = navigator.serviceWorker.register('sw.js', { scope : './' });
   swPromise.then( (registration) => { console.log('Service worker registered with: ', registration); });
   
+  this._checkForSWUpdates(swPromise);
+
+};
+
+IndexController.prototype._checkForSWUpdates = function(swPromise) {
+  //there's no controller, this page wasn't loaded via SW
+  if (!navigator.serviceWorker.controller) { 
+    return;
+  }
+  let indexController = this;
+  
+  //updated worker already waiting
+  if (swPromise.waiting) {
+    indexController._updateReady();
+  }
+
+  //updated worker installing, waiting until installed:
+  if (swPromise.installing) {
+    //there's an update in progress, but it might fail
+    swPromise.installing.addEventListener('statechange', () => {
+      if (this.state == 'installed') {
+        //there's an update ready and waiting
+        indexController._updateReady();
+      }
+    });
+  }
+
+  //listen for new installing workers, if one arrives, track it's progress
+  swPromise.addEventListener('updatefound', () => {
+    swPromise.installing.addEventListener('statechange', () => {
+      if (this.state == 'installed') {
+        //there's an update ready and waiting
+        indexController._updateReady();
+      }
+    });
+  });
+};
+
+IndexController.prototype._updateReady = function() {
+  var toast = this._toastsView.show("New version available", {
+    buttons: ['whatever']
+  });
 };
 
 // open a connection to the server for live updates
