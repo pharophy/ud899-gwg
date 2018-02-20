@@ -16,42 +16,45 @@ IndexController.prototype._registerServiceWorker = function() {
     
   const swPromise = navigator.serviceWorker.register('sw.js', { scope : './' });
   swPromise.then( (registration) => { console.log('Service worker registered with: ', registration); });
-  
-  this._checkForSWUpdates(swPromise);
+  //check for updates to SW
+  let indexController = this;
+  swPromise.then((reg) => this._checkForSWUpdates(reg, indexController) );
 
 };
 
-IndexController.prototype._checkForSWUpdates = function(swPromise) {
+IndexController.prototype._checkForSWUpdates = function(registration, indexController) {
   //there's no controller, this page wasn't loaded via SW
   if (!navigator.serviceWorker.controller) { 
     return;
   }
-  let indexController = this;
   
   //updated worker already waiting
-  if (swPromise.waiting) {
+  if (registration.waiting) {
     indexController._updateReady();
+    return;
   }
 
   //updated worker installing, waiting until installed:
-  if (swPromise.installing) {
+  if (registration.installing) {
     //there's an update in progress, but it might fail
-    swPromise.installing.addEventListener('statechange', () => {
-      if (this.state == 'installed') {
-        //there's an update ready and waiting
-        indexController._updateReady();
-      }
-    });
+    indexController._trackInstalling(registration.installing, indexController);
+    return;
   }
 
   //listen for new installing workers, if one arrives, track it's progress
-  swPromise.addEventListener('updatefound', () => {
-    swPromise.installing.addEventListener('statechange', () => {
-      if (this.state == 'installed') {
-        //there's an update ready and waiting
-        indexController._updateReady();
-      }
-    });
+  registration.addEventListener('updatefound', () => {
+    if (registration.installing) {
+      indexController._trackInstalling(registration.installing, indexController);
+    }
+  });
+};
+
+IndexController.prototype._trackInstalling = function(worker, indexController) {
+  worker.addEventListener('statechange', () => {
+    if (worker.state == 'installed') {
+      //there's an update ready and waiting
+      indexController._updateReady();
+    }
   });
 };
 
