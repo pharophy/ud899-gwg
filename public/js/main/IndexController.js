@@ -30,7 +30,7 @@ IndexController.prototype._checkForSWUpdates = function(registration, indexContr
   
   //updated worker already waiting
   if (registration.waiting) {
-    indexController._updateReady();
+    indexController._updateReady(registration.waiting);
     return;
   }
 
@@ -47,21 +47,35 @@ IndexController.prototype._checkForSWUpdates = function(registration, indexContr
       indexController._trackInstalling(registration.installing, indexController);
     }
   });
+
+  //listen for the controlling service worker changing and reload the page
+  navigator.serviceWorker.AddEventListener('controllerchange', () => {
+    //navigator.serviceWorker.controller has changed, meaning a new service worker has taken over
+    debugger;
+    location.reload();
+  });
 };
 
 IndexController.prototype._trackInstalling = function(worker, indexController) {
   worker.addEventListener('statechange', () => {
     if (worker.state == 'installed') {
       //there's an update ready and waiting
-      indexController._updateReady();
+      indexController._updateReady(worker);
     }
   });
 };
 
-IndexController.prototype._updateReady = function() {
+IndexController.prototype._updateReady = function(worker) {
   var toast = this._toastsView.show("New version available", {
-    buttons: ['whatever']
+    buttons: ['refresh', 'dismiss']
   });
+
+  toast.answer.then((answer) => {
+    if (answer != 'refresh') return;
+    //tell service worker to skip waiting
+    debugger;
+    worker.postMessage({reload : true});
+  })
 };
 
 // open a connection to the server for live updates
