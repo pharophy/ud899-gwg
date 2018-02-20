@@ -53,8 +53,10 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('message', (event) => {
-  debugger;
+
   if (event.data.reload) {
     self.skipWaiting();
   }
 });
+
+//test refresh with comment 4
