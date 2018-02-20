@@ -24,7 +24,8 @@ self.addEventListener('install', (event) => {
 const cachedResource = async (request) => {
   const cache = await caches.open(staticCacheName);
   let response = null;
-  if (request.url === 'http://localhost:8888/') {
+  const requestUrl = new URL(request.url);
+  if (requestUrl.origin === location.origin && requestUrl.pathname === '/') {
     response = await cache.match('/skeleton');
   } else {
     response = await cache.match(request);
