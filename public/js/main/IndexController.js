@@ -51,7 +51,7 @@ IndexController.prototype._checkForSWUpdates = function(registration, indexContr
   //listen for the controlling service worker changing and reload the page
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     //navigator.serviceWorker.controller has changed, meaning a new service worker has taken over
-    location.reload();
+    window.location.reload();
   });
 };
 
