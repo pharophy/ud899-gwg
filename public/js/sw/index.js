@@ -5,7 +5,7 @@ let staticCacheName = 'wittr-static-v4';
 self.addEventListener('install', (event) => {
 
   const cacheIndex =  [
-    '/',
+    '/skeleton',
     '/js/main.js',
     'css/main.css',
     'imgs/icon.png',
@@ -22,8 +22,14 @@ self.addEventListener('install', (event) => {
 });
 
 const cachedResource = async (request) => {
-  const cache = await caches.open(staticCacheName)
-  let response = await cache.match(request);
+  const cache = await caches.open(staticCacheName);
+  let response = null;
+  if (request.url === 'http://localhost:8888/') {
+    response = await cache.match('/skeleton');
+  } else {
+    response = await cache.match(request);
+  }
+
   if (response) {
     return response;
   } else {
