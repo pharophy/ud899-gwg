@@ -51,3 +51,10 @@ const filterCacheNames = async (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(filterCacheNames());
 });
+
+self.addEventListener('message', (event) => {
+  debugger;
+  if (event.data.reload) {
+    self.skipWaiting();
+  }
+});
