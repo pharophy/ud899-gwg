@@ -159,6 +159,23 @@ navigator.serviceWorker.register('/sw.js').then( (reg) => {
 });
 ```
 
+#### Activating waiting serviceWorkers
+```javascript
+  sw.skipWaiting(); //while it's waiting or installing, this signals that it shouldn't queue behind another worker and should take over straight away
+
+  //sending messages to service workers:
+  reg.installing.postMessage({ foo: 'bar'})
+    //send msg in service worker:
+  sw.addEventListener('message', (event) => { 
+    event.data // {foo: 'bar'}
+  });
+
+  navigator.serviceWorker.AddEventListener('controllerchange', () => {
+    //navigator.serviceWorker.controller has changed, meaning a new service worker has taken over
+    //this is a signal that we should reload the page
+  });
+```
+
 ### Caching API
 ```javascript
 //create a cache-box of name to store series of request / responses
