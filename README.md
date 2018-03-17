@@ -200,3 +200,62 @@ caches.match(request) //searches all caches for request
 caches.delete('cache-name'); //deletes a cache
 caches.keys() //gets all keys for all caches
 ```
+
+
+## Syntax
+
+### Symbols
+To create a symbol, you write Symbol() with an optional string as its description.
+
+```javascript
+const sym1 = Symbol('apple');
+console.log(sym1);
+//output: Symbol(apple)
+```
+
+#### Symbols are guaranteed unique:
+
+```javascript
+const sym2 = Symbol('banana');
+const sym3 = Symbol('banana');
+console.log(sym2 === sym3);
+//output: false
+```
+
+#### Symbol usage:
+
+```javascript
+const bowl = {
+  [Symbol('apple')]: { color: 'red', weight: 136.078 },
+  [Symbol('banana')]: { color: 'yellow', weight: 183.15 },
+  [Symbol('orange')]: { color: 'orange', weight: 170.097 },
+  [Symbol('banana')]: { color: 'yellow', weight: 176.845 }
+};
+console.log(bowl);
+```
+
+### Iterables
+
+The iterator method, which is available via the constant [Symbol.iterator], is a zero arguments function that returns an iterator object. An iterator object is an object that conforms to the iterator protocol.
+
+The iterator protocol is used to define a standard way that an object produces a sequence of values. What that really means is you now have a process for defining how an object will iterate. This is done through implementing the .next() method.
+
+An object becomes an iterator when it implements the .next() method. The .next() method is a zero arguments function that returns an object with two properties:
+
+* value : the data representing the next value in the sequence of values within the object
+* done : a boolean representing if the iterator is done going through the sequence of values
+If done is true, then the iterator has reached the end of its sequence of values.
+If done is false, then the iterator is able to produce another value in its sequence of values.
+Here’s the example from earlier, but instead we are using the array’s default iterator to step through the each value in the array.
+
+```javascript
+const digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+const arrayIterator = digits[Symbol.iterator]();  //we are getting the iterator object from the digits array
+
+console.log(arrayIterator.next());
+console.log(arrayIterator.next());
+console.log(arrayIterator.next());
+//output: Object {value: 0, done: false}
+//output: Object {value: 1, done: false}
+//output: Object {value: 2, done: false}
+```
