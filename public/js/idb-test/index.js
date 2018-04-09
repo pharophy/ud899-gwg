@@ -1,10 +1,16 @@
 import idb from 'idb';
 
 var dbPromise = idb.open('test-db', 2, function(upgradeDb) {
-  var keyValStore = upgradeDb.createObjectStore('keyval');
-  keyValStore.put("world", "hello");
 
-  upgradeDb.createObjectStore('people', { ketPath: 'name' });
+  switch(upgradeDb.oldVersion) {
+    case 0:
+      var keyValStore = upgradeDb.createObjectStore('keyval');
+      keyValStore.put("world", "hello");
+      //specifically does not have BREAK; statement to continue across versions
+    case 1:
+      upgradeDb.createObjectStore('people', { ketPath: 'name' });
+      //specifically does not have BREAK; statement to continue across versions
+  }
   
 });
 
