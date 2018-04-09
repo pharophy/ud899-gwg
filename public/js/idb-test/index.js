@@ -1,8 +1,11 @@
 import idb from 'idb';
 
-var dbPromise = idb.open('test-db', 1, function(upgradeDb) {
+var dbPromise = idb.open('test-db', 2, function(upgradeDb) {
   var keyValStore = upgradeDb.createObjectStore('keyval');
   keyValStore.put("world", "hello");
+
+  upgradeDb.createObjectStore('people', { ketPath: 'name' });
+  
 });
 
 // read "hello" in "keyval"
@@ -32,4 +35,6 @@ dbPromise.then(function(db) {
   let keyValStore = tx.objectStore('keyval');
   keyValStore.put('dog', 'favoriteAnimal');
   return tx.complete;  //REMEMBER TO CLOSE / GET RESULT OF TRANSACTION!
+}).then(function(val) {
+  console.log("Completed successfully with: ", val);
 });
