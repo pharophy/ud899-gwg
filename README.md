@@ -201,6 +201,25 @@ caches.delete('cache-name'); //deletes a cache
 caches.keys() //gets all keys for all caches
 ```
 
+## Index DB
+In this course we are using the idb library (https://github.com/jakearchibald/idb) (https://www.npmjs.com/package/idb)
+
+### Methods
+see: https://github.com/jakearchibald/idb
+
+```javascript
+idb.open('key', version, callback);  //Creates new db
+idb.createObjectStore('name'); //creates a table in db
+
+db.transaction('keyval'); //runs a transaction against an object store (could have multiple object stores)
+  //alternate:
+  db.transaction('keyval', 'readwrite'); //allows read and write to object store
+let keyStore = tx.objectStore('keyval'); //gets data from a specific object store
+keyStore.get('hello'); //returns world from the keystore
+keyStore.put("value", "key");  //sets a key value pair (yes in opposite order)
+tx.complete //property that notes when a transaction completes
+```
+
 
 ## Syntax
 
