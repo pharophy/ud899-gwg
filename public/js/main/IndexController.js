@@ -2,12 +2,34 @@ import PostsView from './views/Posts';
 import ToastsView from './views/Toasts';
 import idb from 'idb';
 
+function openDatabase() {
+  //if the browser doesn't support sw's then we don't care about having a db:
+  if (!navigator.serviceWorker) {
+    return Promise.resolve();
+  }
+  //return a promise for a db called 'wittr' with objectStore 'witters'
+  //id = key, index by-date sorted by time property
+  var dbPromise = idb.open('wittr', 2, function(upgradeDb) {
+    let peopleStore;
+    switch(upgradeDb.oldVersion) {    
+      case 0:
+        upgradeDb.createObjectStore('wittrs', { keyPath: 'id' });
+      case 1:
+        let wittrStore = upgradeDb.transaction.objectStore('wittrs');
+        wittrStore.createIndex('by-date', 'time');
+    } 
+  });
+
+  return dbPromise;
+}
+
 export default function IndexController(container) {
   this._container = container;
   this._postsView = new PostsView(this._container);
   this._toastsView = new ToastsView(this._container);
   this._lostConnectionToast = null;
   this._openSocket();
+  this._dbPromise = openDatabase();
   this._registerServiceWorker();
 }
 
@@ -124,5 +146,18 @@ IndexController.prototype._openSocket = function() {
 // called when the web socket sends message data
 IndexController.prototype._onSocketMessage = function(data) {
   var messages = JSON.parse(data);
+  
+  this._dbPromise.then(function(db) {
+    if (!db) return;
+    let tx = db.transaction('wittrs', 'readwrite');
+    let wittrStore = tx.objectStore('wittrs');
+    for (const message of messages) {
+      wittrStore.put(message);
+    }
+    
+    ////let timeIndex = wittrStore.index('by-date');
+    ////return timeIndex.getAll();
+  });
+
   this._postsView.addPosts(messages);
 };
