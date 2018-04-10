@@ -180,9 +180,17 @@ IndexController.prototype._onSocketMessage = function(data) {
     for (const message of messages) {
       wittrStore.put(message);
     }
-    
-    ////let timeIndex = wittrStore.index('by-date');
-    ////return timeIndex.getAll();
+
+    //clean over 30 entries:
+    wittrStore.index('by-date').openCursor(null, 'prev') //send us backwards through the index **
+      .then(function cleanDb(cursor) {
+        if (!cursor) return;
+        cursor.advance(30);
+      }).then(function deleteRest(cursor) {
+        if (!cursor) return;
+        cursor.delete();
+        return cursor.continue().then(deleteRest);
+      });
   });
 
   this._postsView.addPosts(messages);
