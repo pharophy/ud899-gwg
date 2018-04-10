@@ -137,17 +137,32 @@ IndexController.prototype._cleanImageCache = async function() {
   return await this._dbPromise.then(async function(db) {
     if (!db) return;
     //open wittr object store, get all messages, gather all photo urls
-    let photoUrls = await db.transaction('wittrs').objectStore('wittrs').index('by-date').getAll();
+    const wittrs = await db.transaction('wittrs').objectStore('wittrs').getAll();
+    //where we have photos, get photo urls
+    let photoUrls = await _.filter(wittrs, (e) => e.photo).map((e) =>  e.photo);
     //next open wittr-content-imgs cache and delete any entry we no longer need
     let cache = await caches.open('wittr-content-imgs');
-    let keys = await cache.keys();
+    if (!cache) return;
+    let keys = await _.map(await cache.keys(), (e) => new URL(e.url).pathname);
+    console.log('photoUrls', photoUrls);
+    console.log('keys', keys);
     photoUrls = photoUrls.sort();
     keys = keys.sort();
-    let diff = _.difference(photoUrls, keys);
-    for(let unmatched of diff) {
-      let success = await cache.delete(unmatched);
+    //find cache keys that are not in photoUrls
+    const keysNotInPhotoUrls = _.difference(keys, photoUrls);
+    //const UrlsNotInKeys = _.difference(photoUrls, keys);
+    console.log('keysNotInPhotoUrls', keysNotInPhotoUrls);
+    //console.log('UrlsNotInKeys', UrlsNotInKeys);
+    for(let unmatchedUrl of keysNotInPhotoUrls) {
+      let exists = await cache.match(unmatchedUrl);
+      if (!exists) {
+        console.log("can't find in cache: ", unmatchedUrl);
+      } else {
+        console.log("FOUND in cache: ", unmatchedUrl);
+        let success = await cache.delete(unmatchedUrl);
+        console.log('result of cache delete: ', success);
+      }
     }
-    
     //submit @ cache-clean
   });
 };
