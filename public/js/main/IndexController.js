@@ -139,18 +139,22 @@ IndexController.prototype._cleanImageCache = async function() {
     //open wittr object store, get all messages, gather all photo urls
     const wittrs = await db.transaction('wittrs').objectStore('wittrs').getAll();
     //where we have photos, get photo urls
+    let imageUrls = [];
     let photoUrls = await _.filter(wittrs, (e) => e.photo).map((e) =>  e.photo);
+    imageUrls.push(photoUrls);
+    let avatarUrls = await _.filter(wittrs, (e) => e.avatar).map((e) => e.avatar);
+    imageUrls.push(avatarUrls);
     //next open wittr-content-imgs cache and delete any entry we no longer need
     let cache = await caches.open('wittr-content-imgs');
     if (!cache) return;
     let keys = await _.map(await cache.keys(), (e) => new URL(e.url).pathname);
-    //console.log('photoUrls', photoUrls);
+    //console.log('imageUrls', imageUrls);
     //console.log('keys', keys);
-    photoUrls = photoUrls.sort();
+    imageUrls = imageUrls.sort();
     keys = keys.sort();
-    //find cache keys that are not in photoUrls
-    const keysNotInPhotoUrls = _.difference(keys, photoUrls);
-    //const UrlsNotInKeys = _.difference(photoUrls, keys);
+    //find cache keys that are not in imageUrls
+    const keysNotInPhotoUrls = _.difference(keys, imageUrls);
+    //const UrlsNotInKeys = _.difference(imageUrls, keys);
     //console.log('keysNotInPhotoUrls', keysNotInPhotoUrls);
     //console.log('UrlsNotInKeys', UrlsNotInKeys);
     for(let unmatchedUrl of keysNotInPhotoUrls) {
