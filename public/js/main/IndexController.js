@@ -31,6 +31,11 @@ export default function IndexController(container) {
   this._openSocket();
   this._dbPromise = openDatabase();
   this._registerServiceWorker();
+
+  let indexController = this;
+  this._showCachedMessages().then(function () {
+    indexController._openSocket();
+  });
 }
 
 IndexController.prototype._registerServiceWorker = function() {
@@ -76,6 +81,27 @@ IndexController.prototype._checkForSWUpdates = function(registration, indexContr
     window.location.reload();
   });
 };
+
+IndexController.prototype._showCachedMessages = function() {
+  const indexController = this;
+
+  return this._dbPromise.then(function(db) {
+    if (!db /*|| indexController._postsView.showingPosts()*/) return;
+
+    //get all from idb, then pass to _indexController._postsView.addPosts(messages)
+    //remember to return a promise so that websocked isn't opened until you're done
+    indexController._dbPromise.then(function(db) {
+      if (!db) return;
+      let timeIndex = db.transaction('wittrs')
+        .objectStore('wittrs')
+        .index('by-date');
+      return timeIndex.getAll();
+    }).then(function(messages) {
+      indexController._postsView.addPosts(messages.reverse());
+    });
+    
+  });
+}
 
 IndexController.prototype._trackInstalling = function(worker, indexController) {
   worker.addEventListener('statechange', () => {

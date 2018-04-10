@@ -1,6 +1,6 @@
 import 'babel-polyfill';
 //test 10
-let staticCacheName = 'wittr-static-v4';
+let staticCacheName = 'wittr-static-v5';
 
 self.addEventListener('install', (event) => {
 
