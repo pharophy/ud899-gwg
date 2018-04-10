@@ -45,8 +45,6 @@ const cachedResource = async (request) => {
   }
 };
 
-//TODO: lesson 12. Quiz: Cleaning Photo Cache Quiz
-
 async function servePhoto(request, cache) {
   let storageUrl = request.url.replace(/-\d+px\.jpg$/, '');
   let cachedImage = await cache.match(storageUrl);
@@ -61,14 +59,14 @@ async function servePhoto(request, cache) {
 
 self.addEventListener('fetch', (event) => {
   
-  console.log(event);
+  //console.log(event);
   event.respondWith(cachedResource(event.request));
 
 });
 
 const filterCacheNames = async (event) => {
   let keys = await caches.keys();
-  console.log(keys);
+  //console.log(keys);
   keys = keys.filter(key => key.startsWith('wittr-') && !allCaches.includes(key));  //handler for both static & imgs cache
   keys.map(key => {
     return caches.delete(key);
