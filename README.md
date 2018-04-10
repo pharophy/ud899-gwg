@@ -203,6 +203,7 @@ caches.keys() //gets all keys for all caches
 
 ## Index DB
 In this course we are using the idb library (https://github.com/jakearchibald/idb) (https://www.npmjs.com/package/idb)
+see: public/js/idb-test/index.js or localhost:8888/idb-test/
 
 ### Methods
 see: https://github.com/jakearchibald/idb
