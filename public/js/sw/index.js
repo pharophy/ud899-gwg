@@ -45,6 +45,8 @@ const cachedResource = async (request) => {
   }
 };
 
+//TODO: lesson 12. Quiz: Cleaning Photo Cache Quiz
+
 async function servePhoto(request, cache) {
   let storageUrl = request.url.replace(/-\d+px\.jpg$/, '');
   let cachedImage = await cache.match(storageUrl);
