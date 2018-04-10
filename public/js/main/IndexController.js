@@ -1,6 +1,8 @@
 import PostsView from './views/Posts';
 import ToastsView from './views/Toasts';
 import idb from 'idb';
+import 'babel-polyfill';
+import _ from 'lodash';
 
 function openDatabase() {
   //if the browser doesn't support sw's then we don't care about having a db:
@@ -31,8 +33,14 @@ export default function IndexController(container) {
   this._openSocket();
   this._dbPromise = openDatabase();
   this._registerServiceWorker();
+  this._cleanImageCache();
 
   let indexController = this;
+
+  setInterval(function() {
+    indexController._cleanImageCache();
+  }, 1000 * 60 * 5);
+
   this._showCachedMessages().then(function () {
     indexController._openSocket();
   });
@@ -101,7 +109,7 @@ IndexController.prototype._showCachedMessages = function() {
     });
     
   });
-}
+};
 
 IndexController.prototype._trackInstalling = function(worker, indexController) {
   worker.addEventListener('statechange', () => {
@@ -121,7 +129,27 @@ IndexController.prototype._updateReady = function(worker) {
     if (answer != 'refresh') return;
     //tell service worker to skip waiting
     worker.postMessage({reload : true});
-  })
+  });
+};
+
+//clean image cache
+IndexController.prototype._cleanImageCache = async function() {
+  return await this._dbPromise.then(async function(db) {
+    if (!db) return;
+    //open wittr object store, get all messages, gather all photo urls
+    let photoUrls = await db.transaction('wittrs').objectStore('wittrs').index('by-date').getAll();
+    //next open wittr-content-imgs cache and delete any entry we no longer need
+    let cache = await caches.open('wittr-content-imgs');
+    let keys = await cache.keys();
+    photoUrls = photoUrls.sort();
+    keys = keys.sort();
+    let diff = _.difference(photoUrls, keys);
+    for(let unmatched of diff) {
+      let success = await cache.delete(unmatched);
+    }
+    
+    //submit @ cache-clean
+  });
 };
 
 // open a connection to the server for live updates
