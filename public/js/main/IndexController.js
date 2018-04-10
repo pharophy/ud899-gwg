@@ -94,7 +94,7 @@ IndexController.prototype._showCachedMessages = function() {
   const indexController = this;
 
   return this._dbPromise.then(function(db) {
-    if (!db /*|| indexController._postsView.showingPosts()*/) return;
+    if (!db || indexController._postsView.showingPosts()) return;
 
     //get all from idb, then pass to _indexController._postsView.addPosts(messages)
     //remember to return a promise so that websocked isn't opened until you're done
