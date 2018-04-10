@@ -227,6 +227,23 @@ peopleStore.createIndex('animal', 'favoriteAnimal');
 //read from index:
 var animalIndex = peopleStore.index('animal');
 return animalIndex.getAll(); //or .getAll('cat') to only query where === cat;
+
+//iterating:
+dbPromise.then(function(db) {
+  var tx = db.transaction('people');
+  var peopleStore = tx.objectStore('people');
+  var ageIndex = peopleStore.index('age');
+  return ageIndex.openCursor();
+}).then(function logPerson(cursor) {
+  if (!cursor) return;  //if there are no entries it's undefined
+  console.log('Cursorerd at: ' + cursor.value.name);
+  //can use: cursor.update(newValue)
+  //cursor.delete() to remove self
+  //cursor.advance(2) skips the first two items
+  return cursor.continue().then(logPerson);
+}).then(function() {
+  console.log("all persons iterated!");
+});
 ```
 
 
