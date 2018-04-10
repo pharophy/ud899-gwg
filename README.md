@@ -218,6 +218,14 @@ let keyStore = tx.objectStore('keyval'); //gets data from a specific object stor
 keyStore.get('hello'); //returns world from the keystore
 keyStore.put("value", "key");  //sets a key value pair (yes in opposite order)
 tx.complete //property that notes when a transaction completes
+
+//create index: [in db.open upgrade:]
+let peopleStore = upgradeDb.transaction.objectStore('people');
+peopleStore.createIndex('animal', 'favoriteAnimal');
+
+//read from index:
+var animalIndex = peopleStore.index('animal');
+return animalIndex.getAll(); //or .getAll('cat') to only query where === cat;
 ```
 
 
