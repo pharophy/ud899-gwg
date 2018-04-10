@@ -1,6 +1,8 @@
 import 'babel-polyfill';
 //test 10
-let staticCacheName = 'wittr-static-v5';
+let staticCacheName = 'wittr-static-v6';
+let contentImgsCache = 'wittr-content-imgs';
+var allCaches = [ staticCacheName, contentImgsCache];
 
 self.addEventListener('install', (event) => {
 
@@ -31,12 +33,29 @@ const cachedResource = async (request) => {
     response = await cache.match(request);
   }
 
+  if (requestUrl.pathname.startsWith('/photos/')) {
+    const imgCache = await caches.open(contentImgsCache);
+    response = await servePhoto(request, imgCache);
+  }
+
   if (response) {
     return response;
   } else {
     return await fetch(request);
   }
 };
+
+async function servePhoto(request, cache) {
+  let storageUrl = request.url.replace(/-\d+px\.jpg$/, '');
+  let cachedImage = await cache.match(storageUrl);
+  if (cachedImage) {
+    return cachedImage;
+  } else {
+    let response = await fetch(request);
+    cache.put(storageUrl, response.clone()); //can only read response once, so have to clone it
+    return response;
+  }
+}
 
 self.addEventListener('fetch', (event) => {
   
@@ -48,7 +67,7 @@ self.addEventListener('fetch', (event) => {
 const filterCacheNames = async (event) => {
   let keys = await caches.keys();
   console.log(keys);
-  keys = keys.filter(key => key.startsWith('wittr-') && key != staticCacheName);
+  keys = keys.filter(key => key.startsWith('wittr-') && !allCaches.includes(key));  //handler for both static & imgs cache
   keys.map(key => {
     return caches.delete(key);
   });
