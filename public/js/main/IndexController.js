@@ -144,23 +144,23 @@ IndexController.prototype._cleanImageCache = async function() {
     let cache = await caches.open('wittr-content-imgs');
     if (!cache) return;
     let keys = await _.map(await cache.keys(), (e) => new URL(e.url).pathname);
-    console.log('photoUrls', photoUrls);
-    console.log('keys', keys);
+    //console.log('photoUrls', photoUrls);
+    //console.log('keys', keys);
     photoUrls = photoUrls.sort();
     keys = keys.sort();
     //find cache keys that are not in photoUrls
     const keysNotInPhotoUrls = _.difference(keys, photoUrls);
     //const UrlsNotInKeys = _.difference(photoUrls, keys);
-    console.log('keysNotInPhotoUrls', keysNotInPhotoUrls);
+    //console.log('keysNotInPhotoUrls', keysNotInPhotoUrls);
     //console.log('UrlsNotInKeys', UrlsNotInKeys);
     for(let unmatchedUrl of keysNotInPhotoUrls) {
       let exists = await cache.match(unmatchedUrl);
       if (!exists) {
-        console.log("can't find in cache: ", unmatchedUrl);
+        //console.log("can't find in cache: ", unmatchedUrl);
       } else {
-        console.log("FOUND in cache: ", unmatchedUrl);
+        //console.log("FOUND in cache: ", unmatchedUrl);
         let success = await cache.delete(unmatchedUrl);
-        console.log('result of cache delete: ', success);
+        //console.log('result of cache delete: ', success);
       }
     }
     //submit @ cache-clean
