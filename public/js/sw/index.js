@@ -38,12 +38,28 @@ const cachedResource = async (request) => {
     response = await servePhoto(request, imgCache);
   }
 
+  if (requestUrl.pathname.startsWith('/avatars/')) {
+    const imgCache = await caches.open(contentImgsCache);
+    response = await serveAvatar(request, imgCache);
+  }
+
   if (response) {
     return response;
   } else {
     return await fetch(request);
   }
 };
+
+async function serveAvatar(request, cache) {
+  let storageUrl = request.url.replace(/-\d+x\.jpg$/, '');
+  //purposely slightly different
+  //here we want to return cachedImages if possible, but then ALWAYS update the cache with the latest avatar URL since these change frequently
+  //let response = await fetch(request);
+  let cachedImage = await cache.match(storageUrl);
+  let response = await fetch(request);
+  cache.put(storageUrl, response.clone()); //can only read response once, so have to clone it
+  return cachedImage || response;
+}
 
 async function servePhoto(request, cache) {
   let storageUrl = request.url.replace(/-\d+px\.jpg$/, '');
