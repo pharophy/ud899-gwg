@@ -249,6 +249,19 @@ dbPromise.then(function(db) {
 
 ## Syntax
 
+### Browser Support
+see: 
+
+for each browser:
+
+- Google Chrome - https://www.chromestatus.com/features#ES6
+- Microsoft Edge - https://developer.microsoft.com/en-us/microsoft-edge/platform/status/?q=ES6
+- Mozilla Firefox - https://platform-status.mozilla.org/
+
+birdseye view of all the feature support for all JavaScript code, check out the ECMAScript Compatibility Table built by @kangax:
+
+- http://kangax.github.io/compat-table/es6/
+
 ### Symbols
 To create a symbol, you write Symbol() with an optional string as its description.
 
