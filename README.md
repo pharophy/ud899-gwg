@@ -550,3 +550,25 @@ const positions = generatorIterator.next(`${name} is magnificent!`).value;
 // displays each name with description on its own line
 positions.join('\n');
 ```
+
+## Developer Fu
+
+### Polyfills
+see: [https://github.com/Modernizr/Modernizr/wiki/HTML5-Cross-Browser-Polyfills](https://github.com/Modernizr/Modernizr/wiki/HTML5-Cross-Browser-Polyfills)
+
+### Transpiling
+- Use babel
+- For online transpiler see: [http://babeljs.io/repl/#?babili=false&evaluate=true&lineWrap=false&presets=es2015](http://babeljs.io/repl/#?babili=false&evaluate=true&lineWrap=false&presets=es2015)
+
+#### Use
+The way Babel transforms code from one language to another is through plugins. There are plugins that transform ES6 arrow functions to regular ES5 functions (the ES2015 arrow function plugin). There are plugins that transform ES6 template literals to regular string concatenation (the ES2015 template literals transform). For a full list, check out all of Babel's plugins.
+
+Now, you're busy and you don't want to have to sift through a big long list of plugins to see which ones you need to convert your code from ES6 to ES5. So instead of having to use a bunch of individual plugins, Babel has presets which are groups of plugins bundled together. So instead of worrying about which plugins you need to install, we'll just use the ES2015 preset that is a collection of all the plugins we'll need to convert all of our ES6 code to ES5.
+
+You can see that the project has a .babelrc file. This is where you'd put all of the plugins and/or presets that the project will use. Since we want to convert all ES6 code, we've set it up so that it has the ES2015 preset.
+
+#### How it all ties together:
+
+- package.json/devDependencies: need to install babel && babel-cli packages
+- .babelrc: which presets to use for babel transformation
+- package.json/scripts/build: may be used for instructions for babel when it runs (like gulp)
